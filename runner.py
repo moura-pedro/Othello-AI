@@ -3,6 +3,7 @@ import sys
 import time
 
 import tictactoe as ttt
+import test as t
 
 pygame.init()
 size = width, height = 700, 700
@@ -11,6 +12,8 @@ size = width, height = 700, 700
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (1, 50, 32)
+gray = (150.2, 150.2, 150.2)
+light_green = (140, 240, 140)
 
 screen = pygame.display.set_mode(size)
 
@@ -19,6 +22,7 @@ largeFont = pygame.font.Font("OpenSans-Regular.ttf", 40)
 moveFont = pygame.font.Font("OpenSans-Regular.ttf", 60)
 
 user = None
+ai = None
 board = ttt.initial_state()
 ai_turn = False
 
@@ -64,10 +68,15 @@ while True:
             mouse = pygame.mouse.get_pos()
             if playXButton.collidepoint(mouse):
                 time.sleep(0.2)
-                user = ttt.X
+                user = ttt.B
+                ai = ttt.W
+                player = ttt.B
             elif playOButton.collidepoint(mouse):
                 time.sleep(0.2)
-                user = ttt.O
+                user = ttt.W
+                ai = ttt.B
+                player = ttt.B
+                ai_turn = True
 
     else:
 
@@ -87,7 +96,7 @@ while True:
                 pygame.draw.rect(screen, white, rect, 1)
 
                 if board[i][j] != ttt.EMPTY:
-                    if board[i][j] == ttt.X:
+                    if board[i][j] == ttt.B:
                         pygame.draw.circle(screen, black, rect.center, 20)
                     else:
                         pygame.draw.circle(screen, white, rect.center, 20)
@@ -100,7 +109,6 @@ while True:
             tiles.append(row)
 
         game_over = ttt.terminal(board)
-        player = ttt.player(board)
 
         # Show title
         if game_over:
@@ -111,6 +119,16 @@ while True:
                 title = f"Game Over: {winner} wins."
         elif user == player:
             title = f"Player's Turns"
+            possible_actions = ttt.actions(board, player)
+
+            for action in possible_actions:
+
+                rectTest = pygame.Rect(
+                        tile_origin[1] + action[1] * tile_size,
+                        tile_origin[0] + action[0] * tile_size,
+                        tile_size, tile_size
+                    )
+                pygame.draw.circle(screen, light_green, rectTest.center, 20, 1)
         else:
             title = f"Computer thinking..."
         title = largeFont.render(title, True, white)
@@ -119,7 +137,7 @@ while True:
         screen.blit(title, titleRect)
 
         # Check for AI move
-        if user != player and not game_over:
+        if not game_over:
             if ai_turn:
                 time.sleep(0.5)
                 move = ttt.minimax(board)
@@ -132,10 +150,10 @@ while True:
         click, _, _ = pygame.mouse.get_pressed()
         if click == 1 and user == player and not game_over:
             mouse = pygame.mouse.get_pos()
-            for i in range(3):
-                for j in range(3):
+            for i in range(8):
+                for j in range(8):
                     if (board[i][j] == ttt.EMPTY and tiles[i][j].collidepoint(mouse)):
-                        board = ttt.result(board, (i, j))
+                        board = ttt.result(board, (i, j), player)
 
         if game_over:
             againButton = pygame.Rect(width / 3, height - 65, width / 3, 50)
@@ -154,3 +172,4 @@ while True:
                     ai_turn = False
 
     pygame.display.flip()
+
