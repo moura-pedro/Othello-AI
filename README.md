@@ -11,4 +11,5 @@ To start the game:
 
 After running it, a GUI should show up like this:
 
-// TODO
+<img width="500" alt="funfa?" src="https://github.com/moura-pedro/Othello-AI/assets/62116654/ec12eb23-4284-4e42-818b-01ca1876f9a3">
+
